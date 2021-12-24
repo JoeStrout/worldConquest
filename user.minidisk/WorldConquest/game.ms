@@ -388,7 +388,7 @@ enterState = function(state)
 		drawStatus "GAME OVER!"
 		while mouse.button; end while
 		while not mouse.button; end while		
-		run  // start over!
+		reset; load "title"; run  // start over!
 	end if
 	
 end function
