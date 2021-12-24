@@ -50,7 +50,7 @@ noIcon = file.loadImage("pics/noIcon.png")
 
 drawImageCentered = function(g, image, x, y, tint="#FFFFFF")
 	w = image.width; h = image.height
-	g.drawImage image, round(x-w/2), round(y-w/2), w, h, 0, 0, w, h, tint
+	g.drawImage image, round(x-w/2), round(y-h/2), w, h, 0, 0, w, h, tint
 end function
 
 composingGfx = new PixelDisplay
@@ -67,21 +67,24 @@ makePlayerButtonImage = function(team)
 	cy = 40
 	composingGfx.clear color.clear, cx*2, cy*2
 	drawImageCentered composingGfx, hexFill, cx, cy, team.color
-	drawImageCentered composingGfx, icon, cx, cy-4
+	drawImageCentered composingGfx, icon, cx, cy
 	drawImageCentered composingGfx, hexFrame, cx, cy
 	return composingGfx.getImage
 end function
 
 changePlayer = function()
+	redrawMap = true
 	if self.team.eliminated then
 		self.team.eliminated = false
 		self.team.human = true
 	else if self.team.human then
 		self.team.human = false
+		redrawMap = false
 	else
 		self.team.eliminated = true
 	end if
 	self.image = makePlayerButtonImage(self.team)
+	if redrawMap then grid.randomizePlayerCells
 end function
 
 makeTeamButton = function(teamNum)
@@ -158,6 +161,16 @@ events.eventLoop.onGotKey = function(keyChar)
 	end if
 end function
 
+events.eventLoop.onClick = function()
+	col = textUtil.textCol(mouse.x)
+	row = textUtil.textRow(mouse.y)
+	if col < mapListLeft or col > mapListLeft + mapListWidth then return
+	if row > mapListTop or row < mapListTop - mapListRows then return
+	hit = mapListTop - row - mapListScroll
+	if hit >= mapFiles.len then return
+	selectMap hit
+end function
+
 returnToTitle = function()
 	load "title"
 	run
@@ -192,7 +205,6 @@ continueBtn.onKey["space"] = @startGame
 continueBtn.x = 480+200
 continueBtn.y = 100
 continueBtn.start
-
 
 events.eventLoop.run
 

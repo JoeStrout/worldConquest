@@ -53,18 +53,22 @@ end function
 columns = 15
 rows = 12
 tiles = file.loadImage("/sys/pics/TileShapes.png")
-gfx.clear color.clear
-display(6).mode = displayMode.tile
-td = display(6)
-td.tileSet = tiles
-td.tileSetTileSize = 64
-td.cellSize = 64
-td.oddColOffset = 0
-td.oddRowOffset = 0.5  // makes a hex td by rows!
-td.overlap = [7,15]
-td.extent = [columns, rows]
-td.scrollX = -32
-td.scrollY = -32
+
+prepareDisplay = function
+	gfx.clear color.clear
+	display(6).mode = displayMode.tile
+	outer.td = display(6)
+	td.tileSet = tiles
+	td.tileSetTileSize = 64
+	td.cellSize = 64
+	td.oddColOffset = 0
+	td.oddRowOffset = 0.5  // makes a hex td by rows!
+	td.overlap = [7,15]
+	td.extent = [columns, rows]
+	td.scrollX = -32
+	td.scrollY = -32
+end function
+prepareDisplay
 spacing = [td.cellSize - td.overlap[0], td.cellSize - td.overlap[1]]
 
 colRange = range(0, columns-1)
@@ -82,12 +86,12 @@ CellInfo.make = function(col, row)
 	noob.row = row
 	return noob
 end function
-CellInfo.desc = function()
+CellInfo.desc = function
 	n = "Unclaimed"
 	if self.owner >= 0 then n = teams[self.owner].name
 	return n + " cell at " + self.col + "," + self.row + " with " + self.soldiers + " soldiers"
 end function
-CellInfo.show = function()
+CellInfo.show = function
 	if self.isWater then
 		tint = bgColor
 	else if self.owner >= 0 then
@@ -214,15 +218,41 @@ addLandHex = function(col, row, newColor="#888888")
 	end for
 end function
 
-randRow = function()
+randRow = function
 	return round(rnd * rows/2 + rnd * rows/2)
 end function
-randCol = function()
+randCol = function
 	return round(rnd * columns/2 + rnd * columns/2)
 end function
 
+randomPlayerIndex = function
+	while true
+		idx = floor(rnd * teams.len) 
+		if not teams[idx].eliminated then return idx
+	end while
+end function
+
+// Randomly assign players to land cells.
+randomizePlayerCells = function
+	// ensure we have at least one valid player
+	valid = false
+	for t in teams
+		if not t.eliminated then
+			valid = true
+			break
+		end if
+	end for
+	if not valid then return
+	for c in colRange
+		for r in rowRange
+			ci = cellInfo[c][r]
+			if not ci.isWater then ci.setOwner randomPlayerIndex
+		end for
+	end for
+end function
+
 // Generate a random map.
-genMap = function()	
+genMap = function
 	// land high points:
 	landPoints = []
 	for i in range(1 + ceil(rnd*3))
@@ -241,7 +271,7 @@ genMap = function()
 				if dsqr < lp.lake^2 then isWater = true
 			end for
 			cellInfo[c][r].setWater isWater
-			if not isWater then cellInfo[c][r].setOwner floor(rnd * teams.len) 
+			if not isWater then cellInfo[c][r].setOwner randomPlayerIndex
 		end for
 	end for
 end function
@@ -260,7 +290,7 @@ loadMap = function(mapName, assignPlayers=true)
 			if col < data.len and data[col] == "@" then
 				cellInfo[col][row].setWater false
 				td.setCellTint col, row, landColor
-				if assignPlayers then cellInfo[col][row].setOwner floor(rnd * teams.len)
+				if assignPlayers then cellInfo[col][row].setOwner randomPlayerIndex
 			else
 				cellInfo[col][row].setWater true
 			end if

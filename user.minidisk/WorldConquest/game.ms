@@ -6,7 +6,8 @@ clear
 display(7).mode = displayMode.solidColor
 display(7).color = bgColor
 
-import "grid"
+grid.prepareDisplay
+
 rows = grid.rows; columns = grid.columns
 rowRange = grid.rowRange; colRange = grid.colRange
 cellInfo = grid.cellInfo
@@ -392,6 +393,7 @@ enterState = function(state)
 	
 end function
 
+genStart
 lastMouseButton = mouse.button
 attackingCell = null
 defendingCell = null
@@ -447,27 +449,6 @@ update = function()
 		doBattle
 	end if
 end function
-
-// Present a map for the user to choose (or reroll)
-text.color = color.gray
-text.delimiter = ""
-while true
-	grid.genMap
-	genStart
-	
-	text.inverse = true
-	text.row = 0
-	text.column = 20
-	print char(57856) + "PLAY" + char(57857)
-	text.column = 40
-	print char(57856) + "NEW MAP" + char(57857)
-	text.inverse = false
-	
-	while mouse.button; end while
-	while not mouse.button; end while
-	if mouse.x < gfx.width/2 then break
-end while
-text.delimiter = char(13)
 
 // Start the first turn
 state = null
