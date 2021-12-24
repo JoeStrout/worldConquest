@@ -1,0 +1,34 @@
+World Conquest
+
+(elaborated version of our Speed Conquest demo)
+
+
+Game flow:
+1. Title Screen (image, music)
+	- Instructions: go to 2
+	- New Game: go to 3
+2. Instructions (image, or several); then go to 1
+3. Game Setup
+	- players/AIs
+	- map selection 
+		(inc. several standard maps: World, Middle Earth, etc.)
+	- play options
+		- fast AI turns
+		- sound/music volume
+	- Begin (go to 4), Cancel (go to 1)
+4. Gameplay
+	- pause/help: show brief help
+	- Esc: confirm, then go to 1
+	- complete game: go to 5
+5. Post-game scene
+	- show winner (with fireworks?)
+	- instant replay
+	- power graph
+	- go to 1
+
+
+We should also spruce up that map editor, and leave it in there as something for players to find.  Right now it breaks the maps into quadrants; instead we should have it save complete maps.
+
+
+Music credits:
+Title theme: "The Adventure Begins" by Humans Win (Lance Conrad).  Licensed through storyblocks.com.
