@@ -51,13 +51,14 @@ end function
 
 // Add a history entry recording the state of the game
 recordHistory = function()
-	entry = {}  // key: player; value: list of cells owned
+	entry = {}  // key: player number; value: list of cells owned
 	// for each cell, it's [column, row, soldiers]
 	for t in teams.indexes; entry[t] = []; end for
 	for c in colRange
 		for r in rowRange
-			ci = cellInfo[c][r]			
-			if ci.owner >= 0 then	entry[ci.owner].push [c,r, ci.soldiers]
+			ci = cellInfo[c][r]
+			if ci.isWater or ci.owner < 0 then continue	
+			entry[ci.owner].push [c,r, ci.soldiers]
 		end for		
 	end for
 	history.push entry
@@ -177,7 +178,7 @@ genStart = function()
 		end for
 		// Now, distribute soldiers among those hexes
 		soldiersLeft = 25 + 5 * teams[teamNum].human
-		while soldiersLeft > 0
+		while soldiersLeft > 0 and hexes
 			hex = hexes[rnd * hexes.len]
 			if hex.soldiers >= 6 then continue
 			hex.setSoldiers hex.soldiers + 1
@@ -346,7 +347,7 @@ enterState = function(state)
 	text.color = teams[curPlayer].color
 	
 	if state == kStateSelectingAttacker then
-		globals.hurry = false
+		//globals.hurry = false
 		if attackingCell != null then
 			attackingCell.setSelected false
 			globals.attackingCell = null
@@ -380,6 +381,11 @@ enterState = function(state)
 		if isGameOver then enterState kStateGameOver
 	else if state == kStateGameOver then
 		recordHistory
+		
+		print "OK, now check history"
+		print "and maybe make a graph!"
+		exit
+		
 		drawDoneButton false
 		drawStatus "GAME OVER!  (Click for Replay.)"
 		while mouse.button; end while
@@ -458,7 +464,7 @@ enterState kStateSelectingAttacker
 // Main loop
 while true
 	update
-	if key.available and key.get == char(10) then globals.hurry = true
+	if key.available and key.get == char(10) then globals.hurry = not hurry
 	yield
 end while
 key.clear
