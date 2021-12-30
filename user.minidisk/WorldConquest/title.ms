@@ -26,14 +26,15 @@ events.EventSprite.onGoodClick = null
 
 events.EventSprite.showDown = function()
 	if self.isDown then return
-	self.scale = 0.95
+	self.fullScale = self.scale
+	self.scale = self.fullScale * 0.95
 	self.y = self.y - 3
 	self.isDown = true
 end function
 
 events.EventSprite.showUp = function()
 	if not self.isDown then return
-	self.scale = 1
+	self.scale = self.fullScale
 	self.y = self.y + 3
 	self.isDown = false	
 end function

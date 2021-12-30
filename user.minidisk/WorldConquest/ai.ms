@@ -5,7 +5,7 @@
 
 selectAttacker = function()
 	//drawStatus teams[curPlayer].name + " is thinking..."
-	if not hurry then wait
+	if not hurry then niceWait
 	
 	// Find our largest group -- this is the one we mostly want to expand.
 	myGroups = findGroups(curPlayer)

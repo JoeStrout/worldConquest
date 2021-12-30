@@ -172,11 +172,15 @@ events.eventLoop.onClick = function()
 end function
 
 returnToTitle = function()
+	events.eventLoop.onClick = null
+	events.eventLoop.onGotKey = null
 	load "title"
 	run
 end function
 
 startGame = function()
+	events.eventLoop.onClick = null
+	events.eventLoop.onGotKey = null
 	for i in range(60)
 		bgm.adjust 0.25 * i/60
 		yield

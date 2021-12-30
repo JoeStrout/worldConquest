@@ -25,6 +25,49 @@ failSnd.init 0.1, 400, [0,1,0], Sound.noiseWave
 reinforceSnd = new Sound
 reinforceSnd.init 0.05, 10, [1,1,1,0], Sound.noiseWave
 
+// Prepare haste control
+setHaste = function(hasteOn)
+	globals.hurry = hasteOn
+	if hasteOn then
+		rabbitBtn.tint = "#DDDDDD"
+		turtleBtn.tint = "#888888"
+	else
+		turtleBtn.tint = "#DDDDDD"
+		rabbitBtn.tint = "#888888"
+	end if
+end function
+toggleHaste = function()
+	setHaste not hurry
+end function
+
+rabbitBtn = new events.EventSprite
+rabbitBtn.image = file.loadImage("pics/RabbitIcon.png")
+rabbitBtn.scale = 0.25
+rabbitBtn.x = 944
+rabbitBtn.y = 624
+rabbitBtn.onGoodClick = function()
+	setHaste true
+end function
+rabbitBtn.start
+
+turtleBtn = new events.EventSprite
+turtleBtn.image = file.loadImage("pics/TurtleIcon.png")
+turtleBtn.scale = 0.25
+turtleBtn.x = 910
+turtleBtn.y = 625
+turtleBtn.onGoodClick = function()
+	setHaste false
+end function
+turtleBtn.start
+
+// "nice" wait: processes events while waiting
+niceWait = function(duration = 1)
+	endTime = time + duration
+	while time < endTime
+		yield
+		events.eventLoop.update
+	end while
+end function
 
 countTeamStats = function(playerNum)
 	team = teams[playerNum]
@@ -80,7 +123,7 @@ end function
 showHistoryReplay = function()
 	for entry in history
 		showHistoryEntry entry
-		wait 0.25
+		niceWait 0.25
 	end for
 end function
 
@@ -301,7 +344,7 @@ doBattle = function()
 		countTeamStats defender
 		if teams[defender].eliminated then
 			drawStatus teams[defender].name + " is eliminated!"
-			wait 1
+			niceWait 1
 		end if
 	else
 		// defender won
@@ -339,8 +382,8 @@ doReinforcements = function()
 			if choice.soldiers > 5 then options.remove options.indexOf(choice)
 			reinforceSnd.freq = 9 + 2 * rnd
 			reinforceSnd.play
-			if key.available and key.get == char(10) then globals.hurry = true
-			if not hurry then wait delay
+			if key.available and key.get == char(10) then toggleHaste
+			if not hurry then niceWait delay
 			delay = delay * 0.9
 		end for
 	else
@@ -428,11 +471,14 @@ enterState = function(state)
 	
 end function
 
+setHaste false
 genStart
 lastMouseButton = mouse.button
 attackingCell = null
 defendingCell = null
+
 update = function()
+	events.eventLoop.update
 	mouseDown = mouse.button and not lastMouseButton
 	if mouseDown then clicked = grid.cellAt(mouse) else clicked = null
 	globals.lastMouseButton = mouse.button
@@ -458,7 +504,7 @@ update = function()
 		if not teams[curPlayer].human then
 			globals.defendingCell = ai.selectTarget
 			defendingCell.setSelected
-			if not hurry then wait 0.3
+			if not hurry then niceWait 0.3
 			enterState kStateDoingBattle
 			return
 		end if
@@ -493,7 +539,6 @@ enterState kStateSelectingAttacker
 // Main loop
 while true
 	update
-	if key.available and key.get == char(10) then globals.hurry = not hurry
 	yield
 end while
 key.clear
