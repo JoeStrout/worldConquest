@@ -249,20 +249,48 @@ doBattle = function()
 	text.row = 0; text.column = 0; text.delimiter = ""
 	print " " * 66
 	
-	attack = roll(attackingCell.soldiers + 1)
-	defense = roll(defendingCell.soldiers + 1)
+	defender = defendingCell.owner
+	countTeamStats curPlayer
+	countTeamStats defender
+	attackerFull = (teams[curPlayer].soldiers == teams[curPlayer].territories * 7)
+	defenderFull = (teams[defender].soldiers == teams[defender].territories * 7)
+	attackerBigger = (teams[curPlayer].territories > teams[defender].territories)
 	
-	s = "Attack: " + (attackingCell.soldiers + 1) + "d6 = " + attack + "   "
-	if attack > defense then s = s + ">" else s = s + "<="
-	s = s + "   Defense: " + (defendingCell.soldiers + 1) + "d6 = " + defense
-	text.column = 34 - s.len/2; print s
+	attackDice = attackingCell.soldiers + 1
+	defenseDice = defendingCell.soldiers + 1
+	noLossDefense = false
+	
+	// Juggernaut rule: a player whose territories are completely
+	// full (of soldiers), and has more than the other players,
+	// gets +3 dice and takes no losses on successful defense.
+	if attackDice == 7 and attackerFull and attackerBigger then
+		attackDice = attackDice + 3
+	else if defenseDice == 7 and defenderFull and not attackerBigger then
+		defenseDice = defenseDice + 3
+		noLossDefense = true
+	end if
+	
+	attack = roll(attackDice)
+	defense = roll(defenseDice)
+	
+	text.color = teams[curPlayer].color
+	s = "Attack: " + attackDice + "d6 = " + attack + "   "
+	text.column = 33 - s.len
+	print s
+	if attack > defense then
+		print ">"
+		text.color = teams[defender].color
+	else
+		text.color = teams[defender].color
+		print "<="
+	end if
+	print "   Defense: " + defenseDice + "d6 = " + defense
 	text.delimiter = char(13)
 	
 	if attack > defense then
 		// attacker won
 		conquerSnd.freq = 40 + 20 * rnd
 		conquerSnd.play
-		defender = defendingCell.owner
 		defendingCell.setOwner curPlayer
 		lost = round((attackingCell.soldiers + 1) * defense/attack)
 		survivors = attackingCell.soldiers + 1 - lost
@@ -279,6 +307,7 @@ doBattle = function()
 		// defender won
 		failSnd.play
 		lost = round((defendingCell.soldiers + 1) * attack/defense)
+		if noLossDefense then lost = 0
 		survivors = defendingCell.soldiers + 1 - lost
 		attackingCell.setSoldiers 0
 		defendingCell.setSoldiers survivors - 1
