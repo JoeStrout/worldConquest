@@ -46,7 +46,9 @@ returnToTitle = function
 
 	events.eventLoop.onUpdate = null
 
-	reset; load "title"; run
+	reset
+	text.color = color.clear; text.row = 25
+	load "title"; run
 end function
 
 background = new Sprite

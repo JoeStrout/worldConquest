@@ -462,6 +462,7 @@ enterState = function(state)
 	else if state == kStateGameOver then
 		recordHistory
 		drawDoneButton false
+		text.color = color.clear; text.row = 25
 		load "postgame"; run
 	end if
 	

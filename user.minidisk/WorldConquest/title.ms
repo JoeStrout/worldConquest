@@ -40,6 +40,7 @@ showInstructions = function
 end function
 
 startGame = function
+	text.color = color.clear
 	load "setup"
 	run
 end function
