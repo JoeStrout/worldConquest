@@ -29,7 +29,7 @@ powerGraph = function
 	key.clear
 	g.mode = displayMode.off
 	while mouse.button; end while
-	while key.pressed("return") or key.pressed("enter") or key.presesd("space")
+	while key.pressed("return") or key.pressed("enter") or key.pressed("space")
 		yield
 	end while
 	key.clear

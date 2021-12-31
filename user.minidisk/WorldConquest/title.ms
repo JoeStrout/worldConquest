@@ -1,4 +1,5 @@
 clear
+import "listUtil"
 
 gfx.drawImage file.loadImage("pics/WORLDCONQUEST.png")
 if globals.hasIndex("bgm") then
@@ -12,11 +13,33 @@ end if
 
 import "events"
 
-showInstructions = function()
-	print "Instructions not yet implemented."
+hideInstructions = function
+	gfx.drawImage file.loadImage("pics/WORLDCONQUEST.png")
+
+	events.spriteDisplay.sprites.removeVal backBtn	
+	instructionsBtn.start
+	playBtn.start
 end function
 
-startGame = function()
+showInstructions = function
+	gfx.drawImage file.loadImage("pics/instructions.png")
+	
+	events.spriteDisplay.sprites.removeVal instructionsBtn
+	events.spriteDisplay.sprites.removeVal playBtn
+		
+	outer.backBtn = new events.EventSprite
+	backBtn.image = file.loadImage("pics/backBtn.png")
+	backBtn.onGoodClick = @hideInstructions
+	backBtn.onKey = new events.KeyHandler
+	backBtn.onKey["escape"] = @hideInstructions
+	backBtn.onKey["b"] = @hideInstructions
+	backBtn.x = 180
+	backBtn.y = 100
+	backBtn.start
+
+end function
+
+startGame = function
 	load "setup"
 	run
 end function
