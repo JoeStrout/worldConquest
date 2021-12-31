@@ -1,4 +1,5 @@
 import "graph"
+import "fireworks"
 
 events.spriteDisplay.clear
 text.clear
@@ -43,6 +44,8 @@ returnToTitle = function
 	end for
 	endMusic.stop
 
+	events.eventLoop.onUpdate = null
+
 	reset; load "title"; run
 end function
 
@@ -86,5 +89,10 @@ replayBtn.onKey["return"] = @returnToTitle
 replayBtn.onKey["enter"] = @returnToTitle
 replayBtn.onKey["space"] = @returnToTitle
 doneBtn.start
+
+display(2).mode = displayMode.pixel
+fireworks.gfx = display(2)
+fireworks.setup
+events.eventLoop.onUpdate = @fireworks.update
 
 events.eventLoop.run
