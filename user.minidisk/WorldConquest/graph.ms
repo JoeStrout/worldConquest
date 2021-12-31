@@ -12,30 +12,35 @@ drawGraph = function(g)
 	miny = 20
 	maxy = g.height - 20
 	yspan = maxy - miny
-	gfx.fillRect minx, miny, xspan, yspan, "#222222"
+	g.fillRect minx, miny, xspan, yspan, "#FFFFFFDD"
+	g.drawRect minx, miny-1, xspan, yspan+2, color.white
 	maxTurn = history.len - 1
 	maxCells = 0
 	for playerData in history[0].values
 		maxCells = maxCells + playerData.len
 	end for
-	for plNum in history[0].indexes
-		g.color = teams[plNum].color
-		for turn in history.indexes
+	lastx = 0
+	lasty = {}		// key: player number; value: last y
+	for turn in history.indexes
+		x = minx + xspan * turn / maxTurn
+		for plNum in history[0].indexes
+			g.color = teams[plNum].color
+			turnCount = history.indexes.len
 			cells = history[turn][plNum].len
-			x = minx + xspan * turn / maxTurn
 			y = miny + yspan * cells / maxCells
 			if turn > 0 then
-				g.line lastx, lasty, x, y, g.color, 4
+				g.line lastx, lasty[plNum], x, y, g.color, 4
 			end if
-			lastx = x
-			lasty = y
+			lasty[plNum] = y
 		end for
+		g.drawRect minx, miny-1, xspan, yspan+2, color.white
+		lastx = x - 1  // (creating a small amount of overlap to reduce gaps)
+		wait 3 / turnCount
 	end for
-	gfx.drawRect minx, miny, xspan, yspan, color.white
 end function
 
 
 if locals == globals then
 	clear
 	drawGraph gfx
-end function
+end if

@@ -86,10 +86,18 @@ end function
 
 isGameOver = function()
 	count = 0
+	winner = null
 	for team in teams
-		if not team.eliminated then count = count + 1
+		if not team.eliminated then
+			count = count + 1
+			winner = team
+		end if
 	end for
-	return count < 2
+	if count < 2 then
+		globals.winner = winner
+		return true
+	end if
+	return false
 end function
 
 // Add a history entry recording the state of the game
@@ -453,20 +461,8 @@ enterState = function(state)
 		if isGameOver then enterState kStateGameOver
 	else if state == kStateGameOver then
 		recordHistory
-		
-		print "OK, now check history"
-		print "and maybe make a graph!"
-		exit
-		
 		drawDoneButton false
-		drawStatus "GAME OVER!  (Click for Replay.)"
-		while mouse.button; end while
-		while not mouse.button; end while
-		showHistoryReplay
-		drawStatus "GAME OVER!"
-		while mouse.button; end while
-		while not mouse.button; end while		
-		reset; load "title"; run  // start over!
+		load "postgame"; run
 	end if
 	
 end function

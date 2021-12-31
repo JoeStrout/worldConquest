@@ -77,9 +77,6 @@ playBtn.x = 480+200
 playBtn.y = 100
 playBtn.start
 
-while true
-	yield
-	events.eventLoop.run
-end while
+events.eventLoop.run
 
 		
